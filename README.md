@@ -63,7 +63,7 @@ This GNN allows us to learn the representations of molecular fingerprints.
 - PyTorch
 - scikit-learn
 - RDKit
-
+    - conda install -c conda-forge pytorch scikit-learn rdkit
 
 ## Usage
 
