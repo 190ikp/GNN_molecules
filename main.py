@@ -5,6 +5,7 @@ import torch.optim as optim
 import torch
 import argparse
 import timeit
+import os
 
 from model import MolecularGraphNeuralNetwork
 
@@ -130,5 +131,6 @@ if __name__ == '__main__':
     parser.add_argument('--seed', default=123)
     args = parser.parse_args()
     print(vars(args))
+    os.makedirs('model', exist_ok=True)
 
     main(args)
