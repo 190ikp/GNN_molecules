@@ -7,10 +7,7 @@ which aims to predict compound-protein interactions for drug discovery.
 Using the proposed GNN, in this page we provide an implementation of the model
 for predicting various molecular properties such as drug efficacy and photovoltaic efficiency.
 
-<div align="center">
-<p><img src="figures/overview.jpeg" width="600" /></p>
-</div>
-
+<div align="center"><p><img src="figures/overview.jpeg" width="600" /></p></div>
 
 ## Characteristics
 
@@ -20,14 +17,11 @@ preprocessing data and learning a model can be done by only two commands (see "U
 you can learn our GNN with your dataset by the two commands
 (see "Training of our GNN using your molecular property dataset").
 
-
 ## Our GNN model
 
 The basic idea of a GNN can be described as follows:
 
-<div align="center">
-<p><img src="figures/basic_GNN.jpeg" width="600" /></p>
-</div>
+<div align="center"><p><img src="figures/basic_GNN.jpeg" width="600" /></p></div>
 
 The GNN (1) updates the randomly initialized atom vectors
 considering the graph structure of a molecule,
@@ -46,9 +40,7 @@ Such fragments are referred to as r-radius subgraphs or **molecular fingerprints
 Based on this observation, our GNN leverages molecular fingerprints
 and the model can be described as follows:
 
-<div align="center">
-<p><img src="figures/our_GNN.jpeg" width="600" /></p>
-</div>
+<div align="center"><p><img src="figures/our_GNN.jpeg" width="600" /></p></div>
 
 Thus, instead of using atom vectors, we
 (1) extract the fingerprints from a molecular graph
@@ -56,7 +48,6 @@ and initialize them using random vectors,
 (2) obtain the molecular vector by GNN, and then
 (3) learn the representations.
 This GNN allows us to learn the representations of molecular fingerprints.
-
 
 ## Requirements
 
@@ -89,7 +80,6 @@ bash train.sh
 
 You can also change the model hyperparameters described in train.sh (e.g., the dimensionality, number of hidden layers, and batch size). Try to learn various GNN models to find your own best model for your dataset!
 
-
 ## Learning a GNN with your dataset
 
 In this repository, we provide two datasets of regression (see dataset/regression/photovoltaic/data.txt) and classification (see dataset/classification/HIV/data.txt) as follows:
@@ -103,7 +93,6 @@ In this repository, we provide two datasets of regression (see dataset/regressio
 </div>
 
 If you prepare a dataset with the same format (any molecular property can be used!), you can learn a GNN model with your dataset.
-
 
 ## How to cite
 

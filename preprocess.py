@@ -1,6 +1,7 @@
 import numpy as np
 from sklearn.model_selection import train_test_split
 from collections import defaultdict
+import torch
 import argparse
 
 def create_atoms(mol, atom_dict):
@@ -106,8 +107,10 @@ if __name__ == '__main__':
 
     print('Preprocessing the %s dataset.' % args.dataset)
 
-    '''Initialize x_dict, in which each key is a symbol type
-    (e.g., atom and chemical bond) and each value is its index.'''
+    '''
+    Initialize x_dict, in which each key is a symbol type
+    (e.g., atom and chemical bond) and each value is its index.
+    '''
     atom_dict = defaultdict(lambda: len(atom_dict))
     bond_dict = defaultdict(lambda: len(bond_dict))
     fingerprint_dict = defaultdict(lambda: len(fingerprint_dict))
@@ -122,7 +125,8 @@ if __name__ == '__main__':
 
     N_fingerprints = len(fingerprint_dict)
 
-    np.savez_compressed(filename, 
-            dataset_train=dataset_train, 
-            dataset_test=dataset_test, 
-            N_fingerprints=N_fingerprints)
+    torch.save({
+        'dataset_train':dataset_train,
+        'dataset_test':dataset_test,
+        'N_fingerprints': N_fingerprints,
+        }, filename.replace('npz', 'pt'))
