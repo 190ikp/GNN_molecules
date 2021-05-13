@@ -103,7 +103,7 @@ if __name__ == '__main__':
     parser.add_argument('--radius', default=1)
     args = parser.parse_args()
 
-    filename = 'dataset/%s.npz' % args.dataset
+    filename = 'dataset/%s.pt' % (args.dataset)
 
     print('Preprocessing the %s dataset.' % args.dataset)
 
@@ -129,4 +129,4 @@ if __name__ == '__main__':
         'dataset_train':dataset_train,
         'dataset_test':dataset_test,
         'N_fingerprints': N_fingerprints,
-        }, filename.replace('npz', 'pt'))
+        }, filename)
