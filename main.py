@@ -10,8 +10,12 @@ import os
 from model import MolecularGraphNeuralNetwork
 
 def data_load(args, device):
-    filename = 'dataset/%s.npz' % args.dataset
-    dataset_train, dataset_test, N_fingerprints = np.load(filename, allow_pickle=True).values()
+    filename = 'dataset/%s.pt' % args.dataset
+    data = torch.load(filename)
+
+    dataset_train = data['dataset_train']
+    dataset_test = data['dataset_test']
+    N_fingerprints = data['N_fingerprints']
 
     '''Transform numpy data to torch tensor'''
     for index, (fingerprints, adjacency, molecular_size, property) in enumerate(dataset_train):
