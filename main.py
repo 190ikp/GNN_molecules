@@ -10,9 +10,8 @@ import os
 from model import MolecularGraphNeuralNetwork
 
 def data_load(args, device):
-    filename = 'dataset/%s.pt' % args.dataset
+    filename = 'dataset/%s.pth' % args.dataset
     data = torch.load(filename)
-
     dataset_train = data['dataset_train']
     dataset_test = data['dataset_test']
     N_fingerprints = data['N_fingerprints']

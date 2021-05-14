@@ -103,14 +103,12 @@ if __name__ == '__main__':
     parser.add_argument('--radius', default=1)
     args = parser.parse_args()
 
-    filename = 'dataset/%s.pt' % (args.dataset)
+    filename = 'dataset/%s.pth' % (args.dataset)
 
     print('Preprocessing the %s dataset.' % args.dataset)
 
-    '''
-    Initialize x_dict, in which each key is a symbol type
-    (e.g., atom and chemical bond) and each value is its index.
-    '''
+    '''Initialize x_dict, in which each key is a symbol type
+    (e.g., atom and chemical bond) and each value is its index.'''
     atom_dict = defaultdict(lambda: len(atom_dict))
     bond_dict = defaultdict(lambda: len(bond_dict))
     fingerprint_dict = defaultdict(lambda: len(fingerprint_dict))
