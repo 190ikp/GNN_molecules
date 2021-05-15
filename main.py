@@ -3,6 +3,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
 import torch
+from sklearn.metrics import roc_auc_score, accuracy_score, precision_score, recall_score
 import argparse
 import timeit
 import os
@@ -58,9 +59,9 @@ def train(dataset, net, optimizer, loss_function, batch_train, epoch):
             (epoch, batch_index, np.ceil(len(dataset) / batch_train), train_loss / batch_index), end='')
 
 def test(dataset, net, loss_function, batch_test):
-    test_loss = 0
     net.eval()
-
+    test_loss = 0
+    y_score, y_true = [], []
     for batch_index, index in enumerate(range(0, len(dataset), batch_test), 1):
         data_batch = list(zip(*dataset[index:index+batch_test]))
         correct = torch.cat(data_batch[-1])
@@ -68,8 +69,23 @@ def test(dataset, net, loss_function, batch_test):
             predicted = net.forward(data_batch)
         loss = loss_function(predicted, correct)
         test_loss += loss.item()
+        score = F.softmax(predicted, 1).cpu()
+        y_score.append(score)
+        y_true.append(correct.cpu())
 
-    print(' test_loss %5.3f' % (test_loss / batch_index), end='')
+    y_score = np.concatenate(y_score)
+    y_pred = [np.argmax(x) for x in y_score]
+    y_true = np.concatenate(y_true)
+
+    if np.sum(y_pred) != 0:
+        acc = accuracy_score(y_true, y_pred)
+        auc = roc_auc_score(y_true, y_score[:,1])
+        prec = precision_score(y_true, y_pred)
+        recall = recall_score(y_true, y_pred)
+
+        print(' %4d/%4d test_loss %5.3f test_auc %5.3F test_prec %5.3f test_recall %5.3f' % (np.sum(y_pred), np.sum(y_true), test_loss / index, auc, prec, recall), end='')
+    else:
+        print(' %4d/%4d test_loss %5.3f' % (np.sum(y_pred), np.sum(y_true), test_loss / index), end='')
 
     return test_loss / batch_index
 
