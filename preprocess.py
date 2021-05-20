@@ -91,6 +91,7 @@ def create_dataset(args):
             dataset.append((fingerprints, adjacency, molecular_size, property))
 
             print('\r%s: %5d/%5d' % (filename, index, len(lines)), end='')
+        print()
 
     return dataset
 
@@ -119,7 +120,10 @@ if __name__ == '__main__':
     if len(np.unique(property)) == 2:
         print(' positive ratio %4.1f%%' % (sum(property) / len(dataset) * 100))
 
-    dataset_train, dataset_test = train_test_split(dataset, train_size=0.8, test_size=0.2, shuffle=True, stratify=property)
+    if args.task == 'classification':
+        dataset_train, dataset_test = train_test_split(dataset, train_size=0.8, test_size=0.2, shuffle=True, stratify=property)
+    else:
+        dataset_train, dataset_test = train_test_split(dataset, train_size=0.8, test_size=0.2, shuffle=True)
 
     N_fingerprints = len(fingerprint_dict)
 
