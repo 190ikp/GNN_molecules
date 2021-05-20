@@ -29,10 +29,6 @@ class MolecularGraphNeuralNetwork(nn.Module):
             j += n
         return pad_matrices
 
-    def update(self, matrix, vectors, layer):
-        hidden_vectors = torch.relu(self.W_fingerprint[layer](vectors))
-        return hidden_vectors + torch.matmul(matrix, hidden_vectors)
-
     def sum(self, vectors, axis):
         sum_vectors = [torch.sum(v, 0) for v in torch.split(vectors, axis)]
         return torch.stack(sum_vectors)
@@ -50,7 +46,10 @@ class MolecularGraphNeuralNetwork(nn.Module):
         '''GNN layer (update the fingerprint vectors).'''
         fingerprint_vectors = self.embed_fingerprint(fingerprints)
         for l in range(len(self.W_fingerprint)):
-            hs = self.update(adjacencies, fingerprint_vectors, l)
+            #hs = self.update(adjacencies, fingerprint_vectors, l)
+            vectors = self.W_fingerprint[l](fingerprint_vectors)
+            hidden_vectors = torch.relu(vectors)
+            hs = hidden_vectors + torch.matmul(adjacencies, hidden_vectors)
             fingerprint_vectors = F.normalize(hs, 2, 1) # normalize.
 
         '''Molecular vector by sum or mean of the fingerprint vectors.'''
@@ -62,7 +61,8 @@ class MolecularGraphNeuralNetwork(nn.Module):
     def mlp(self, vectors):
         '''Classifier or regressor based on multilayer perceptron.'''
         for l in range(len(self.W_output)):
-            vectors = torch.relu(self.W_output[l](vectors))
+            vectors = self.W_output[l](vectors)
+            vectors = torch.relu(vectors)
         outputs = self.W_property(vectors)
         return outputs
 
