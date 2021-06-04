@@ -46,7 +46,6 @@ class MolecularGraphNeuralNetwork(nn.Module):
         '''GNN layer (update the fingerprint vectors).'''
         fingerprint_vectors = self.embed_fingerprint(fingerprints)
         for l in range(len(self.W_fingerprint)):
-            #hs = self.update(adjacencies, fingerprint_vectors, l)
             vectors = self.W_fingerprint[l](fingerprint_vectors)
             hidden_vectors = torch.relu(vectors)
             hs = hidden_vectors + torch.matmul(adjacencies, hidden_vectors)
