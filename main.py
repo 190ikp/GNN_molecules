@@ -94,7 +94,7 @@ def main(args):
     np.random.seed(args.seed)
     torch.manual_seed(args.seed)
 
-    device = torch.device('cuda' if not args.cpu and torch.cuda.is_available() else 'cpu')
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     print('Using %s device.' % device)
 
     dataset_train, dataset_test, N_fingerprints = data_load(args, device)
@@ -128,7 +128,8 @@ def main(args):
 
         test_losses.append(test_loss)
 
-        if len(test_losses) > 1 and test_loss < min(test_losses[:-1]):
+        if test_loss <= min(test_losses) and args.model_save:
+            os.makedirs('model', exist_ok=True)
             torch.save(net.state_dict(), 'model/%5.3f.pth' % test_loss)
 
 if __name__ == '__main__':
@@ -138,6 +139,7 @@ if __name__ == '__main__':
     parser.add_argument('--task', default='classification', choices=['classification', 'regression'])
     parser.add_argument('--dataset', default='hiv', choices=['hiv', 'photovoltaic', 'postera'])
     parser.add_argument('--modelfile', default=None)
+    parser.add_argument('--model_save', default=False)
     parser.add_argument('--dim', default=50, type=int)
     parser.add_argument('--layer_hidden', default=6, type=int)
     parser.add_argument('--layer_output', default=6, type=int)
@@ -146,11 +148,9 @@ if __name__ == '__main__':
     parser.add_argument('--lr', default=1e-4, type=float)
     parser.add_argument('--lr_decay', default=0.99, type=float)
     parser.add_argument('--decay_interval', default=10, type=int)
-    parser.add_argument('--epochs', default=1000, type=int)
-    parser.add_argument('--cpu', action='store_true')
+    parser.add_argument('--epochs', default=100, type=int)
     parser.add_argument('--seed', default=123, type=int)
     args = parser.parse_args()
     print(vars(args))
-    os.makedirs('model', exist_ok=True)
 
     main(args)
