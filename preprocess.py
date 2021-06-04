@@ -100,7 +100,7 @@ if __name__ == '__main__':
     # classification target is a binary value (e.g., drug or not).
     # regression target is a real value (e.g., energy eV).
     parser.add_argument('--task', default='classification', choices=['classification', 'regression'])
-    parser.add_argument('--dataset', default='hiv', choices=['hiv', 'photovoltaic'])
+    parser.add_argument('--dataset', default='hiv', choices=['hiv', 'photovoltaic', 'postera'])
     parser.add_argument('--radius', default=1)
     args = parser.parse_args()
 
