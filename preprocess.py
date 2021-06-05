@@ -5,6 +5,13 @@ import torch
 import argparse
 import os
 
+'''Initialize x_dict, in which each key is a symbol type
+(e.g., atom and chemical bond) and each value is its index.'''
+atom_dict = defaultdict(lambda: len(atom_dict))
+bond_dict = defaultdict(lambda: len(bond_dict))
+fingerprint_dict = defaultdict(lambda: len(fingerprint_dict))
+edge_dict = defaultdict(lambda: len(edge_dict))
+
 def create_atoms(mol, atom_dict):
     '''Transform the atom types in a molecule (e.g., H, C, and O)
     into the indices (e.g., H=0, C=1, and O=2).
@@ -68,6 +75,8 @@ def extract_fingerprints(radius, atoms, ij_bond_dict, fingerprint_dict, edge_dic
 def create_dataset(args):
     from rdkit import Chem
 
+    filename = 'dataset/%s.pth' % (args.dataset)
+
     dataset = []
 
     # Load a dataset.
@@ -97,21 +106,13 @@ def create_dataset(args):
     return dataset
 
 def main(args):
-    filename = 'dataset/%s.pth' % (args.dataset)
-
-    if os.path.exists(filename):
-        return
-
     print('Preprocessing the %s dataset.' % args.dataset)
 
-    '''Initialize x_dict, in which each key is a symbol type
-    (e.g., atom and chemical bond) and each value is its index.'''
-    atom_dict = defaultdict(lambda: len(atom_dict))
-    bond_dict = defaultdict(lambda: len(bond_dict))
-    fingerprint_dict = defaultdict(lambda: len(fingerprint_dict))
-    edge_dict = defaultdict(lambda: len(edge_dict))
+    if os.path.exists('dataset/%s.pth' % (args.dataset)):
+        return
 
     dataset = create_dataset(args)
+
     property = [float(data[3]) for data in dataset]
     if len(np.unique(property)) == 2:
         print(' positive ratio %4.1f%%' % (sum(property) / len(dataset) * 100))

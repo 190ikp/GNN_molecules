@@ -6,7 +6,6 @@
 
 cd ${PBS_O_WORKDIR}
 
-source activate torch
-
-python preprocess.py
-python main.py --epochs 10
+PYTHON=/home/u75549/anaconda3/envs/torch/bin/python
+${PYTHON} preprocess.py
+${PYTHON} main.py --epochs 10
