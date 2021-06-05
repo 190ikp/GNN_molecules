@@ -3,6 +3,7 @@ from sklearn.model_selection import train_test_split
 from collections import defaultdict
 import torch
 import argparse
+import os
 
 def create_atoms(mol, atom_dict):
     '''Transform the atom types in a molecule (e.g., H, C, and O)
@@ -95,16 +96,11 @@ def create_dataset(args):
 
     return dataset
 
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser()
-    # classification target is a binary value (e.g., drug or not).
-    # regression target is a real value (e.g., energy eV).
-    parser.add_argument('--task', default='classification', choices=['classification', 'regression'])
-    parser.add_argument('--dataset', default='hiv', choices=['hiv', 'photovoltaic', 'postera'])
-    parser.add_argument('--radius', default=1)
-    args = parser.parse_args()
-
+def main(args):
     filename = 'dataset/%s.pth' % (args.dataset)
+
+    if os.path.exists(filename):
+        return
 
     print('Preprocessing the %s dataset.' % args.dataset)
 
@@ -132,3 +128,15 @@ if __name__ == '__main__':
         'dataset_test':dataset_test,
         'N_fingerprints': N_fingerprints,
         }, filename)
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    # classification target is a binary value (e.g., drug or not).
+    # regression target is a real value (e.g., energy eV).
+    parser.add_argument('--task', default='classification', choices=['classification', 'regression'])
+    parser.add_argument('--dataset', default='hiv', choices=['hiv', 'photovoltaic', 'postera'])
+    parser.add_argument('--radius', default=1)
+    args = parser.parse_args([])
+    print(vars(args))
+
+    main(args)
