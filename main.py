@@ -117,7 +117,6 @@ def main(args):
     loss_function = F.cross_entropy if args.task == 'classification' else F.mse_loss
 
     test_losses = []
-    elapsed = []
 
     for epoch in range(args.epochs):
         epoch_start = timeit.default_timer()
@@ -128,8 +127,7 @@ def main(args):
         train(dataset_train, net, optimizer, loss_function, args.batch_train, epoch)
         test_loss = test(dataset_test, net, loss_function, args.batch_test)
 
-        elapsed.append((timeit.default_timer() - epoch_start))
-        print(' %5.2f sec' % (np.mean(elapsed)))
+        print(' %5.2f sec' % (timeit.default_timer() - epoch_start))
 
         test_losses.append(test_loss)
 
