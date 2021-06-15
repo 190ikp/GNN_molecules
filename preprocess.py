@@ -111,6 +111,8 @@ def main(args):
     if os.path.exists('dataset/%s.pth' % (args.dataset)):
         return
 
+    filename = 'dataset/%s.pth' % (args.dataset)
+
     dataset = create_dataset(args)
 
     property = [float(data[3]) for data in dataset]

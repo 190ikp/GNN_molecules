@@ -11,7 +11,7 @@ import os
 from model import MolecularGraphNeuralNetwork
 
 def data_load(args, device):
-    filename = 'dataset/%s.pth' % args.dataset
+    filename = os.path.join('dataset', '%s.pth' % args.dataset)
     data = torch.load(filename)
     dataset_train = data['dataset_train']
     dataset_test = data['dataset_test']
@@ -103,8 +103,11 @@ def main(args):
     print('# of test data samples:', len(dataset_test))
 
     n_output = 1 if args.task == 'regression' else 2
-    net = MolecularGraphNeuralNetwork(N_fingerprints, dim=args.dim, 
-            layer_hidden=args.layer_hidden, layer_output=args.layer_output, n_output=n_output).to(device)
+    net = MolecularGraphNeuralNetwork(N_fingerprints, 
+            dim=args.dim, 
+            layer_hidden=args.layer_hidden, 
+            layer_output=args.layer_output, 
+            n_output=n_output).to(device)
     print('# of model parameters:', sum([np.prod(p.size()) for p in net.parameters()]))
 
     if args.modelfile:
@@ -114,6 +117,7 @@ def main(args):
     loss_function = F.cross_entropy if args.task == 'classification' else F.mse_loss
 
     test_losses = []
+    elapsed = []
 
     for epoch in range(args.epochs):
         epoch_start = timeit.default_timer()
@@ -124,7 +128,8 @@ def main(args):
         train(dataset_train, net, optimizer, loss_function, args.batch_train, epoch)
         test_loss = test(dataset_test, net, loss_function, args.batch_test)
 
-        print(' %5.2f sec' % (timeit.default_timer() - epoch_start))
+        elapsed.append((timeit.default_timer() - epoch_start))
+        print(' %5.2f sec' % (np.mean(elapsed)))
 
         test_losses.append(test_loss)
 
