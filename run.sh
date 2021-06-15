@@ -1,5 +1,5 @@
 #!/bin/bash
-#PBS -l nodes=1:gold5120:ppn=1
+#PBS -l nodes=1:gold6128:ppn=1
 #PBS -N gnn
 #PBS -j oe
 #PBS -o output.log
@@ -18,7 +18,7 @@ KMP_SETTING="KMP_AFFINITY=granularity=fine,compact,1,0"
 export ${KMP_SETTING}
 echo -e "### using ${KMP_SETTING}"
 
-PYTHON=${HOME}/anaconda3/envs/torch/bin/python
+PYTHON=${HOME}/.conda/envs/torch/bin/python
 
 ${PYTHON} preprocess.py
 ${PYTHON} main.py --epochs 5

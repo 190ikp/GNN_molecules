@@ -139,7 +139,7 @@ if __name__ == '__main__':
     parser.add_argument('--task', default='classification', choices=['classification', 'regression'])
     parser.add_argument('--dataset', default='hiv', choices=['hiv', 'photovoltaic', 'postera'])
     parser.add_argument('--radius', default=1)
-    args = parser.parse_args([])
+    args = parser.parse_args()
     print(vars(args))
 
     main(args)
