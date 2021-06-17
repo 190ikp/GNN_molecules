@@ -106,20 +106,12 @@ def create_dataset(args):
     return dataset
 
 def main(args):
-<<<<<<< HEAD
-    print('Preprocessing the %s dataset.' % args.dataset)
-=======
     print('Preprocessing the %s dataset.' % (args.dataset))
->>>>>>> ba02d5a95e8ff9b48159ff8de0b821f39bd9174f
 
-    if os.path.exists('dataset/%s.pth' % (args.dataset)):
+    filename = 'dataset/%s.pth' % (args.dataset)
+    if os.path.exists(filename):
         return
 
-<<<<<<< HEAD
-=======
-    filename = 'dataset/%s.pth' % (args.dataset)
-
->>>>>>> ba02d5a95e8ff9b48159ff8de0b821f39bd9174f
     dataset = create_dataset(args)
 
     property = [float(data[3]) for data in dataset]
@@ -146,11 +138,7 @@ if __name__ == '__main__':
     parser.add_argument('--task', default='classification', choices=['classification', 'regression'])
     parser.add_argument('--dataset', default='hiv', choices=['hiv', 'photovoltaic', 'postera'])
     parser.add_argument('--radius', default=1)
-<<<<<<< HEAD
-    args = parser.parse_args([])
-=======
     args = parser.parse_args()
->>>>>>> ba02d5a95e8ff9b48159ff8de0b821f39bd9174f
     print(vars(args))
 
     main(args)
