@@ -108,10 +108,9 @@ def create_dataset(args):
 def main(args):
     print('Preprocessing the %s dataset.' % (args.dataset))
 
-    if os.path.exists('dataset/%s.pth' % (args.dataset)):
-        return
-
     filename = 'dataset/%s.pth' % (args.dataset)
+    if os.path.exists(filename):
+        return
 
     dataset = create_dataset(args)
 
