@@ -132,7 +132,7 @@ def main(args):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     # classification target is a binary value (e.g., drug or not).
-    parser.add_argument('--dataset', default='hiv', choices=['hiv', 'photovoltaic', 'postera'])
+    parser.add_argument('--dataset', default='hiv', choices=['hiv', 'postera'])
     parser.add_argument('--modelfile', default=None)
     parser.add_argument('--model_save', default=False)
     parser.add_argument('--dim', default=50, type=int)

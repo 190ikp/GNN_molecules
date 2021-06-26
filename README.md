@@ -65,17 +65,10 @@ We provide two major scripts in the main directory as follows.
 
 You can easy to train a GNN model by the following commands.
 
-Clone our repository,
+Clone this repository, and run following scripts for training.
 ```
-git clone https://github.com/masashitsubaki/molecularGNN_smiles.git
-```
-change directory, 
-```
-cd molecularGNN_smiles/main
-```
-and run the bash file for training.
-```
-bash train.sh
+python preprocess.py
+python main.py
 ```
 
 You can also change the model hyperparameters described in train.sh (e.g., the dimensionality, number of hidden layers, and batch size). Try to learn various GNN models to find your own best model for your dataset!

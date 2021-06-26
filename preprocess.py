@@ -99,7 +99,7 @@ def create_dataset(args):
             fingerprints = extract_fingerprints(args.radius, atoms, ij_bond_dict, fingerprint_dict, edge_dict)
             adjacency = Chem.GetAdjacencyMatrix(mol)
 
-            print(fingerprints.shape, adjacency.shape, molecular_size, property)
+            #print(fingerprints.shape, adjacency.shape, molecular_size, property)
             #print(fingerprints, adjacency, molecular_size, property)
 
             dataset.append((fingerprints, adjacency, molecular_size, property))
@@ -119,8 +119,7 @@ def main(args):
     dataset = create_dataset(args)
 
     property = [float(data[3]) for data in dataset]
-    if len(np.unique(property)) == 2:
-        print(' positive ratio %4.1f%%' % (sum(property) / len(dataset) * 100))
+    print(' positive ratio %4.1f%%' % (sum(property) / len(dataset) * 100))
 
     dataset_train, dataset_test = train_test_split(dataset, train_size=0.8, test_size=0.2, shuffle=True, stratify=property)
 
