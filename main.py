@@ -21,19 +21,13 @@ def data_load(args, device):
     for index, (fingerprints, adjacency, molecular_size, property) in enumerate(dataset_train):
         fingerprints = torch.LongTensor(fingerprints).to(device)
         adjacency = torch.FloatTensor(adjacency).to(device)
-        if args.task == 'classification':
-            property = torch.LongTensor([int(property)]).to(device)
-        if args.task == 'regression':
-            property = torch.FloatTensor([[float(property)]]).to(device)
+        property = torch.LongTensor([int(property)]).to(device)
         dataset_train[index] = (fingerprints, adjacency, molecular_size, property)
 
     for index, (fingerprints, adjacency, molecular_size, property) in enumerate(dataset_test):
         fingerprints = torch.LongTensor(fingerprints).to(device)
         adjacency = torch.FloatTensor(adjacency).to(device)
-        if args.task == 'classification':
-            property = torch.LongTensor([int(property)]).to(device)
-        if args.task == 'regression':
-            property = torch.FloatTensor([[float(property)]]).to(device)
+        property = torch.LongTensor([int(property)]).to(device)
         dataset_test[index] = (fingerprints, adjacency, molecular_size, property)
 
     np.random.shuffle(dataset_train)
@@ -102,7 +96,7 @@ def main(args):
     print('# of training data samples:', len(dataset_train))
     print('# of test data samples:', len(dataset_test))
 
-    n_output = 1 if args.task == 'regression' else 2
+    n_output = 2
     net = MolecularGraphNeuralNetwork(N_fingerprints, 
             dim=args.dim, 
             layer_hidden=args.layer_hidden, 
@@ -114,7 +108,7 @@ def main(args):
         net.load_state_dict(torch.load(args.modelfile))
 
     optimizer = optim.Adam(net.parameters(), lr=args.lr)
-    loss_function = F.cross_entropy if args.task == 'classification' else F.mse_loss
+    loss_function = F.cross_entropy
 
     test_losses = []
 
@@ -138,8 +132,6 @@ def main(args):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     # classification target is a binary value (e.g., drug or not).
-    # regression target is a real value (e.g., energy eV).
-    parser.add_argument('--task', default='classification', choices=['classification', 'regression'])
     parser.add_argument('--dataset', default='hiv', choices=['hiv', 'photovoltaic', 'postera'])
     parser.add_argument('--modelfile', default=None)
     parser.add_argument('--model_save', default=False)
