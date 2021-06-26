@@ -75,12 +75,13 @@ def extract_fingerprints(radius, atoms, ij_bond_dict, fingerprint_dict, edge_dic
 def create_dataset(args):
     from rdkit import Chem
 
-    filename = 'dataset/%s.pth' % (args.dataset)
+    filename = os.path.join('dataset', '%s.pth' % (args.dataset))
+    inputfile = os.path.join('dataset', '%s.txt' % (args.dataset))
 
     dataset = []
 
     # Load a dataset.
-    with open('dataset/%s.txt' % args.dataset, 'r') as f:
+    with open(inputfile, 'r') as f:
         lines = f.readlines()
 
         for index, line in enumerate(lines, 1):
@@ -98,6 +99,9 @@ def create_dataset(args):
             fingerprints = extract_fingerprints(args.radius, atoms, ij_bond_dict, fingerprint_dict, edge_dict)
             adjacency = Chem.GetAdjacencyMatrix(mol)
 
+            print(fingerprints.shape, adjacency.shape, molecular_size, property)
+            #print(fingerprints, adjacency, molecular_size, property)
+
             dataset.append((fingerprints, adjacency, molecular_size, property))
 
             print('\r%s: %5d/%5d' % (filename, index, len(lines)), end='')
@@ -108,7 +112,7 @@ def create_dataset(args):
 def main(args):
     print('Preprocessing the %s dataset.' % (args.dataset))
 
-    filename = 'dataset/%s.pth' % (args.dataset)
+    filename = os.path.join('dataset', '%s.pth' % (args.dataset))
     if os.path.exists(filename):
         return
 
