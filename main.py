@@ -34,12 +34,12 @@ def data_load(args, device):
 
     return dataset_train, dataset_test, N_fingerprints
 
-def train(dataset, net, optimizer, loss_function, batch_train, epoch):
+def train(dataset, net, optimizer, loss_function, batch_size, epoch):
     train_loss = 0
     net.train()
 
-    for batch_index, index in enumerate(range(0, len(dataset), batch_train), 1):
-        data_batch = list(zip(*dataset[index:index+batch_train]))
+    for batch_index, index in enumerate(range(0, len(dataset), batch_size), 1):
+        data_batch = list(zip(*dataset[index:index+batch_size]))
         correct = torch.cat(data_batch[-1])
 
         optimizer.zero_grad()
@@ -50,14 +50,14 @@ def train(dataset, net, optimizer, loss_function, batch_train, epoch):
         train_loss += loss.item()
         
     print('epoch %4d batch %4d/%4d train_loss %5.3f' % \
-            (epoch, batch_index, np.ceil(len(dataset) / batch_train), train_loss / batch_index), end='')
+            (epoch, batch_index, np.ceil(len(dataset) / batch_size), train_loss / batch_index), end='')
 
-def test(dataset, net, loss_function, batch_test):
+def test(dataset, net, loss_function, batch_size):
     net.eval()
     test_loss = 0
     y_score, y_true = [], []
-    for batch_index, index in enumerate(range(0, len(dataset), batch_test), 1):
-        data_batch = list(zip(*dataset[index:index+batch_test]))
+    for batch_index, index in enumerate(range(0, len(dataset), batch_size), 1):
+        data_batch = list(zip(*dataset[index:index+batch_size]))
         correct = torch.cat(data_batch[-1])
         with torch.no_grad():
             predicted = net.forward(data_batch)
@@ -118,8 +118,8 @@ def main(args):
         if epoch % args.decay_interval == 0:
             optimizer.param_groups[0]['lr'] *= args.lr_decay
 
-        train(dataset_train, net, optimizer, loss_function, args.batch_train, epoch)
-        test_loss = test(dataset_test, net, loss_function, args.batch_test)
+        train(dataset_train, net, optimizer, loss_function, args.batch_size, epoch)
+        test_loss = test(dataset_test, net, loss_function, args.batch_size)
 
         print(' %5.2f sec' % (timeit.default_timer() - epoch_start))
 
@@ -138,8 +138,7 @@ if __name__ == '__main__':
     parser.add_argument('--dim', default=50, type=int)
     parser.add_argument('--layer_hidden', default=6, type=int)
     parser.add_argument('--layer_output', default=6, type=int)
-    parser.add_argument('--batch_train', default=32, type=int)
-    parser.add_argument('--batch_test', default=32, type=int)
+    parser.add_argument('--batch_size', default=32, type=int)
     parser.add_argument('--lr', default=1e-4, type=float)
     parser.add_argument('--lr_decay', default=0.99, type=float)
     parser.add_argument('--decay_interval', default=10, type=int)
