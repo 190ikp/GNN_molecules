@@ -3,6 +3,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
 import torch
+import poptorch
 from sklearn import metrics
 import argparse
 import timeit
@@ -37,16 +38,22 @@ def data_load(args, device):
 def train(dataset, net, optimizer, loss_function, batch_size, epoch):
     train_loss = 0
     net.train()
+    # wrap in a poptorch wrapper
+    poptorch_net = poptorch.trainingModel(net, optimizer=optimizer)
+    poptorch_net.setOptimizer(optimizer)
 
     for batch_index, index in enumerate(range(0, len(dataset), batch_size), 1):
         data_batch = list(zip(*dataset[index:index+batch_size]))
         correct = torch.cat(data_batch[-1])
 
-        optimizer.zero_grad()
-        predicted = net.forward(data_batch)
-        loss = loss_function(predicted, correct)
-        loss.backward()
-        optimizer.step()
+        # optimizer.zero_grad()
+        # predicted = net.forward(data_batch)
+        # loss = loss_function(predicted, correct)
+        # loss.backward()
+        # optimizer.step()
+
+        # TODO: set variables
+        predicted, loss = poptorch_net()
         train_loss += loss.item()
         
     print('epoch %4d batch %4d/%4d train_loss %5.3f' % \
