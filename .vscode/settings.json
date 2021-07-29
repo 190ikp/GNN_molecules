@@ -1,0 +1,7 @@
+{
+  "python.defaultInterpreterPath": "${workspaceFolder}/.venv/bin/python",
+  "python.autoComplete.extraPaths": ["${env:PYTHONPATH}"],
+  "python.linting.pylintPath": "pylint",
+  "python.linting.pylintEnabled": true,
+  "python.linting.pylintArgs": ["--init-hook", "${env:POPLAR_ROOT}/python/popdist, ${env:POPLAR_ROOT}/python/pva, ${env:POPART_ROOT}/python/popart"]
+}
