@@ -6,8 +6,8 @@
 
 cd "${PBS_O_WORKDIR}" || exit
 
-CPUS=$(grep "physical id" /proc/cpuinfo | sort | uniq | wc -l)
-CORES=$(grep "core id" /proc/cpuinfo | sort | uniq | wc -l)
+CPUS=$(lscpu | grep -i ^socket | sed -e 's/ //g' | cut -d ':' -f 2)
+CORES=$(lscpu | grep -i ^core | sed -e 's/ //g' | cut -d ':' -f 2)
 TOTAL_CORES=$(("${CPUS}" * "${CORES}"))
 
 echo "CPUS=${CPUS} CORES=${CORES} TOTAL_CORES=${TOTAL_CORES}"
