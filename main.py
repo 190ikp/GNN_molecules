@@ -8,9 +8,11 @@ import argparse
 import timeit
 import os
 
+import poptorch
+
 from model import MolecularGraphNeuralNetwork
 
-def data_load(args, device):
+def data_load(args):
     filename = os.path.join('dataset', '%s.pth' % args.dataset)
     data = torch.load(filename)
     dataset_train = data['dataset_train']
@@ -18,50 +20,51 @@ def data_load(args, device):
     N_fingerprints = data['N_fingerprints']
 
     '''Transform numpy data to torch tensor'''
+    #TODO: use FP16 or FP32
     for index, (fingerprints, adjacency, molecular_size, property) in enumerate(dataset_train):
-        fingerprints = torch.LongTensor(fingerprints).to(device)
-        adjacency = torch.FloatTensor(adjacency).to(device)
-        property = torch.LongTensor([int(property)]).to(device)
+        fingerprints = torch.LongTensor(fingerprints)
+        adjacency = torch.FloatTensor(adjacency)
+        property = torch.LongTensor([int(property)])
         dataset_train[index] = (fingerprints, adjacency, molecular_size, property)
 
     for index, (fingerprints, adjacency, molecular_size, property) in enumerate(dataset_test):
-        fingerprints = torch.LongTensor(fingerprints).to(device)
-        adjacency = torch.FloatTensor(adjacency).to(device)
-        property = torch.LongTensor([int(property)]).to(device)
+        fingerprints = torch.LongTensor(fingerprints)
+        adjacency = torch.FloatTensor(adjacency)
+        property = torch.LongTensor([int(property)])
         dataset_test[index] = (fingerprints, adjacency, molecular_size, property)
 
     np.random.shuffle(dataset_train)
 
     return dataset_train, dataset_test, N_fingerprints
 
-def train(dataset, net, optimizer, loss_function, batch_size, epoch):
+def train(dataset, net, optimizer, batch_size, epoch, opts):
     train_loss = 0
     net.train()
+
+    data_train = poptorch.DataLoader(opts, data_train, batch_size, mode=poptorch.DataLoaderMode.Async)
+    poptorch_model = poptorch.trainingModel(net, opts, optimizer)
 
     for batch_index, index in enumerate(range(0, len(dataset), batch_size), 1):
         data_batch = list(zip(*dataset[index:index+batch_size]))
         correct = torch.cat(data_batch[-1])
 
-        optimizer.zero_grad()
-        predicted = net.forward(data_batch)
-        loss = loss_function(predicted, correct)
-        loss.backward()
-        optimizer.step()
+        predicted, loss = poptorch_model(net.forward(data_batch, correct))
+        poptorch_model.setOptimizer(optimizer)
         train_loss += loss.item()
         
     print('epoch %4d batch %4d/%4d train_loss %5.3f' % \
             (epoch, batch_index, np.ceil(len(dataset) / batch_size), train_loss / batch_index), end='')
 
-def test(dataset, net, loss_function, batch_size):
+def test(dataset, net, batch_size, opts):
     net.eval()
+    poptorch_model = poptorch.inferenceModel(net, options=opts)
     test_loss = 0
     y_score, y_true = [], []
     for batch_index, index in enumerate(range(0, len(dataset), batch_size), 1):
         data_batch = list(zip(*dataset[index:index+batch_size]))
         correct = torch.cat(data_batch[-1])
         with torch.no_grad():
-            predicted = net.forward(data_batch)
-        loss = loss_function(predicted, correct)
+            predicted, loss = poptorch_model(net.forward(data_batch, correct))
         test_loss += loss.item()
         score = F.softmax(predicted, 1).cpu()
         y_score.append(score)
@@ -85,13 +88,14 @@ def test(dataset, net, loss_function, batch_size):
     return test_loss / batch_index
 
 def main(args):
+    #TODO: set prefer PopTorch options
+    opts = poptorch.Options()
+    opts.deviceIterations(100)
+
     np.random.seed(args.seed)
     torch.manual_seed(args.seed)
 
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    print('Using %s device.' % device)
-
-    dataset_train, dataset_test, N_fingerprints = data_load(args, device)
+    dataset_train, dataset_test, N_fingerprints = data_load(args)
 
     print('# of training data samples:', len(dataset_train))
     print('# of test data samples:', len(dataset_test))
@@ -101,14 +105,14 @@ def main(args):
             dim=args.dim, 
             layer_hidden=args.layer_hidden, 
             layer_output=args.layer_output, 
-            n_output=n_output).to(device)
+            n_output=n_output)
     print('# of model parameters:', sum([np.prod(p.size()) for p in net.parameters()]))
 
     if args.modelfile:
         net.load_state_dict(torch.load(args.modelfile))
+        poptorch_model = poptorch.inferenceModel(net, options=opts)
 
     optimizer = optim.Adam(net.parameters(), lr=args.lr)
-    loss_function = F.cross_entropy
 
     test_losses = []
 
@@ -118,8 +122,8 @@ def main(args):
         if epoch % args.decay_interval == 0:
             optimizer.param_groups[0]['lr'] *= args.lr_decay
 
-        train(dataset_train, net, optimizer, loss_function, args.batch_size, epoch)
-        test_loss = test(dataset_test, net, loss_function, args.batch_size)
+        train(dataset_train, net, optimizer, args.batch_size, epoch, opts)
+        test_loss = test(dataset_test, net, args.batch_size, opts)
 
         print(' %5.2f sec' % (timeit.default_timer() - epoch_start))
 

@@ -3,6 +3,8 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch
 
+import poptorch
+
 class MolecularGraphNeuralNetwork(nn.Module):
     def __init__(self, N_fingerprints, dim, layer_hidden, layer_output, n_output):
         super(MolecularGraphNeuralNetwork, self).__init__()
@@ -19,7 +21,7 @@ class MolecularGraphNeuralNetwork(nn.Module):
         '''
         shapes = [m.shape for m in matrices]
         M, N = sum([s[0] for s in shapes]), sum([s[1] for s in shapes])
-        zeros = torch.FloatTensor(np.zeros((M, N))).to(matrices[0].device)
+        zeros = torch.FloatTensor(np.zeros((M, N))).to(matrices[0])
         pad_matrices = pad_value + zeros
         i, j = 0, 0
         for k, matrix in enumerate(matrices):
@@ -65,8 +67,13 @@ class MolecularGraphNeuralNetwork(nn.Module):
         outputs = self.W_property(vectors)
         return outputs
 
-    def forward(self, data_batch):
+    def custom_loss(self, predicted, correct):
+        loss = F.cross_entropy(predicted, correct)
+        return poptorch.identity_loss(loss, reduction="none")
+
+    def forward(self, data_batch, correct):
         inputs = data_batch[:-1]
         molecular_vectors = self.gnn(inputs)
         predicted = self.mlp(molecular_vectors)
-        return predicted
+        loss = custom_loss(predicted, correct)
+        return predicted, loss
