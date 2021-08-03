@@ -41,7 +41,7 @@ def train(dataset, net, optimizer, batch_size, epoch, opts):
     train_loss = 0
     net.train()
 
-    data_train = poptorch.DataLoader(opts, data_train, batch_size, mode=poptorch.DataLoaderMode.Async)
+    data_train = poptorch.DataLoader(opts, dataset, batch_size, mode=poptorch.DataLoaderMode.AsyncRebatched)
     poptorch_model = poptorch.trainingModel(net, opts, optimizer)
 
     for batch_index, index in enumerate(range(0, len(dataset), batch_size), 1):

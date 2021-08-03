@@ -75,5 +75,5 @@ class MolecularGraphNeuralNetwork(nn.Module):
         inputs = data_batch[:-1]
         molecular_vectors = self.gnn(inputs)
         predicted = self.mlp(molecular_vectors)
-        loss = custom_loss(predicted, correct)
+        loss = self.custom_loss(predicted, correct)
         return predicted, loss
