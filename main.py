@@ -13,6 +13,7 @@ import poptorch
 from model import MolecularGraphNeuralNetwork
 
 def data_load(args):
+    #TODO: each tensor shuold be equal size?
     filename = os.path.join('dataset', '%s.pth' % args.dataset)
     data = torch.load(filename)
     dataset_train = data['dataset_train']
@@ -41,7 +42,8 @@ def train(dataset, net, optimizer, batch_size, epoch, opts):
     train_loss = 0
     net.train()
 
-    data_train = poptorch.DataLoader(opts, dataset, batch_size, mode=poptorch.DataLoaderMode.AsyncRebatched)
+    # temporary disabled
+    # data_train = poptorch.DataLoader(opts, dataset, batch_size, mode=poptorch.DataLoaderMode.AsyncRebatched)
     poptorch_model = poptorch.trainingModel(net, opts, optimizer)
 
     for batch_index, index in enumerate(range(0, len(dataset), batch_size), 1):
@@ -90,7 +92,6 @@ def test(dataset, net, batch_size, opts):
 def main(args):
     #TODO: set prefer PopTorch options
     opts = poptorch.Options()
-    opts.deviceIterations(100)
 
     np.random.seed(args.seed)
     torch.manual_seed(args.seed)
